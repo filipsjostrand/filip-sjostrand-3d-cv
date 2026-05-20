@@ -1,0 +1,847 @@
+<!doctype html>
+<html lang="sv">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Filip Sjöstrand - 3D CV</title>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+        background: #0b0f19;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        touch-action: none;
+        color: #fff;
+      }
+      #bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        outline: none;
+        z-index: 1;
+        cursor: pointer;
+      }
+
+      /* Fast UI-lager för profil och info */
+      .ui-container {
+        position: fixed;
+        left: 20px;
+        bottom: 20px;
+        z-index: 10;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        max-width: 320px;
+      }
+
+      .profile-card {
+        background: rgba(15, 23, 42, 0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        padding: 20px;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        text-align: left;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        margin-bottom: 10px;
+      }
+
+      /* Gör profilbilden klickbar */
+      .profile-link {
+        display: inline-block;
+        margin-bottom: 12px;
+        transition: transform 0.2s ease;
+      }
+      .profile-link:hover {
+        transform: scale(1.05);
+      }
+
+      .profile-img {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #0a66c2; /* LinkedIn-blå */
+        box-shadow: 0 0 10px rgba(10, 102, 194, 0.4);
+        display: block;
+      }
+
+      h1 {
+        margin: 0 0 4px 0;
+        font-size: 1.4rem;
+        background: linear-gradient(45deg, #3498db, #bdbdbd);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .subtitle {
+        color: #94a3b8;
+        font-size: 0.8rem;
+        margin: 0 0 12px 0;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .intro-text {
+        color: #cbd5e1;
+        font-size: 0.85rem;
+        line-height: 1.4;
+        margin: 0 0 15px 0;
+      }
+
+      /* Kontaktinfo i rutan */
+      .contact-info {
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding-top: 12px;
+        font-size: 0.8rem;
+        color: #94a3b8;
+      }
+      .contact-info a {
+        color: #3498db;
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+      .contact-info a:hover {
+        color: #2ecc71;
+      }
+      .contact-item {
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .instruction {
+        font-size: 0.6rem;
+        opacity: 0.5;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-left: 5px;
+      }
+
+      /* Dynamisk rubrik för aktiv 3D-panel */
+      .active-panel-title {
+        position: fixed;
+        left: 50%;
+        top: 22%;
+        transform: translate(-50%, -50%);
+        z-index: 5;
+        pointer-events: none;
+        text-align: center;
+        width: 90%;
+      }
+
+      #current-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        text-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+        background: linear-gradient(45deg, #ffffff, #cbd5e1);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin: 0;
+        transition: opacity 0.2s ease;
+      }
+
+      /* Fullskärms-overlay när man klickar på en 3D-panel */
+      #fullscreen-overlay {
+        position: fixed;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 100;
+        transition: top 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+        overflow-y: auto;
+        background: #0f172a;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        -webkit-overflow-scrolling: touch;
+      }
+      #fullscreen-overlay.active {
+        top: 0;
+      }
+
+      .close-btn {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        width: 44px;
+        height: 44px;
+        background: rgba(0, 0, 0, 0.7);
+        border: 2px solid white;
+        border-radius: 50%;
+        color: white;
+        font-size: 28px;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 120;
+        line-height: 1;
+        box-sizing: border-box;
+        transform: translateY(-2px);
+        padding-top: 0;
+        padding-bottom: 5px;
+      }
+      #fullscreen-overlay.active .close-btn {
+        display: flex;
+      }
+
+      .fs-container {
+        max-width: 700px;
+        margin: 60px auto;
+        background: #1e293b;
+        color: #f8fafc;
+        padding: 40px;
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      }
+      .fs-title {
+        font-size: 2.2rem;
+        font-weight: 800;
+        margin-bottom: 10px;
+        color: #3498db;
+      }
+      .fs-section-title {
+        font-size: 1.1rem;
+        margin-top: 25px;
+        color: #2ecc71;
+        border-bottom: 1px solid #334155;
+        padding-bottom: 6px;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+      .fs-content p {
+        line-height: 1.6;
+        font-size: 1rem;
+        color: #cbd5e1;
+      }
+
+      .btn-link {
+        display: inline-block;
+        background: #3498db;
+        color: #fff;
+        text-decoration: none;
+        padding: 12px 24px;
+        border-radius: 6px;
+        font-weight: 600;
+        margin-top: 20px;
+        transition: background 0.2s;
+      }
+      .btn-link:hover {
+        background: #2980b9;
+      }
+
+      /* Styling för bläddringspilar */
+      .nav-arrow {
+        position: fixed;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 50px;
+        height: 50px;
+        background: rgba(0, 0, 0, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        color: white;
+        font-size: 36px;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 120;
+        user-select: none;
+        transition:
+          background 0.2s,
+          transform 0.2s;
+        padding-bottom: 6px;
+        box-sizing: border-box;
+      }
+      .nav-arrow:hover {
+        background: rgba(52, 152, 219, 0.8);
+        border-color: #3498db;
+      }
+      #fullscreen-overlay.active .nav-arrow {
+        display: flex;
+      }
+      .nav-arrow:active {
+        transform: translateY(-50%) scale(0.95);
+      }
+      .nav-arrow.prev {
+        left: 30px;
+      }
+      .nav-arrow.next {
+        right: 30px;
+      }
+
+      /* Gömmer/krymper pilarna på mindre skärmar */
+      @media (max-width: 768px) {
+        .nav-arrow {
+          width: 40px;
+          height: 40px;
+          font-size: 28px;
+          padding-bottom: 4px;
+        }
+        .nav-arrow.prev {
+          left: 10px;
+        }
+        .nav-arrow.next {
+          right: 10px;
+        }
+      }
+
+      /* Mobilanpassningar */
+      @media (max-width: 600px) {
+        /* Flyttar hela containern från botten till toppen av skärmen på mobiler */
+        .ui-container {
+          left: 10px;
+          top: 10px;
+          bottom: auto;
+          max-width: calc(100vw - 20px);
+        }
+
+        /* Gör profilkortet mer kompakt och mindre täckande */
+        .profile-card {
+          padding: 12px;
+          background: rgba(15, 23, 42, 0.7);
+          margin-bottom: 4px;
+        }
+
+        /* Lägger profilbild, rubrik och kontakt info på en rad för att spara vertikalt utrymme */
+        .profile-link {
+          margin-bottom: 0;
+        }
+        .profile-img {
+          width: 45px;
+          height: 45px;
+        }
+
+        h1 {
+          font-size: 1.1rem;
+        }
+        .subtitle {
+          font-size: 0.7rem;
+          margin-bottom: 4px;
+        }
+        .intro-text {
+          font-size: 0.75rem;
+          margin-bottom: 6px;
+          line-height: 1.3;
+        }
+
+        .contact-info {
+          padding-top: 6px;
+          font-size: 0.75rem;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px;
+        }
+        .contact-item {
+          margin-bottom: 0;
+        }
+
+        /* Flyttar instruktionstexten till botten av skärmen separat så den inte krockar */
+        .instruction {
+          position: fixed;
+          bottom: 15px;
+          left: 50%;
+          transform: translateX(-50%);
+          font-size: 0.65rem;
+          width: 90%;
+          text-align: center;
+          margin-left: 0;
+        }
+
+        /* Justerar popup/modal-containern för mobiler */
+        .fs-container {
+          margin: 20px;
+          padding: 20px;
+        }
+        .fs-title {
+          font-size: 1.6rem;
+        }
+
+        /* Flyttar ner rubriken under profilkortet i mobilt läge */
+        .active-panel-title {
+          top: auto;
+          bottom: 60%;
+          transform: translate(-50%, 0);
+        }
+        #current-title {
+          font-size: 1.3rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="bg"></canvas>
+
+    <div class="active-panel-title">
+      <h2 id="current-title">-</h2>
+    </div>
+
+    <div class="ui-container">
+      <div class="profile-card">
+        <a
+          href="https://www.linkedin.com/in/filip-sjöstrand"
+          target="_blank"
+          class="profile-link"
+          title="Besök min LinkedIn"
+        >
+          <img
+            src="https://filipsjostrand.github.io/media/img/monday.jpg"
+            alt="Filip Sjöstrand"
+            class="profile-img"
+          />
+        </a>
+        <h1>Filip Sjöstrand</h1>
+        <p class="subtitle">IT-utvecklare/Ingenjör</p>
+        <p class="intro-text">
+          Jag bidrar med kreativa/digitala/tekniska lösningar som skapar värde
+          för människor.
+        </p>
+
+        <div class="contact-info">
+          <div class="contact-item">
+            📞 <a href="tel:+46768772579">0768772579</a>
+          </div>
+          <div class="contact-item">
+            ✉️
+            <a href="mailto:filip_sjostrand@hotmail.com"
+              >filip_sjostrand@hotmail.com</a
+            >
+          </div>
+        </div>
+      </div>
+      <p class="instruction">Dra för att snurra • Klicka för detaljer</p>
+    </div>
+
+    <div id="fullscreen-overlay">
+      <div class="close-btn" id="btn-close">×</div>
+
+      <div class="nav-arrow prev" id="btn-prev">‹</div>
+      <div class="nav-arrow next" id="btn-next">›</div>
+
+      <div class="fs-container">
+        <h1 class="fs-title" id="fs-title">-</h1>
+        <div class="fs-content">
+          <h2 class="fs-section-title">Beskrivning</h2>
+          <div id="fs-overview">-</div>
+
+          <h2 class="fs-section-title">Kompetenser</h2>
+          <ul
+            id="fs-benefits"
+            style="padding-left: 20px; line-height: 1.6; color: #cbd5e1"
+          ></ul>
+
+          <a href="#" id="fs-sheet-link" target="_blank" class="btn-link"></a>
+
+          <p
+            id="fs-credit"
+            style="
+              font-size: 0.8rem;
+              color: #64748b;
+              margin-top: 25px;
+              font-style: italic;
+            "
+          ></p>
+        </div>
+      </div>
+    </div>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+        }
+      }
+    </script>
+
+    <script type="module">
+      import * as THREE from "three";
+
+      // CV-Data mappat i karusellen
+      const cvData = [
+        {
+          title: "💼 Arbetlivsserfarenhet",
+          thumb:
+            "https://images.pexels.com/photos/1656/road-fashion-vintage-bag.jpg",
+          sheetUrl:
+            "https://docs.google.com/spreadsheets/d/1T0DDac-9PDkUwS2AKMkAtCVaMUD3Jr90eSSdtlDtXDs/edit?gid=0#gid=0",
+          overview: `
+            <div style="padding-left: 40px;">
+                
+                <p style="margin-bottom: 5px;">Jag har arbetat som:</p>
+                
+                <ul style="padding-left: 20px; margin: 0; line-height: 1.6;">
+                    <li>Praktikant inom AI/IT mot regionalt näringsliv.</li>
+                    <li>Egenföretagare (99sleepideas.com).</li>
+                    <li>Tekniker/Ingenjör inom industrin.</li>
+                    <li>Lärare/handledare inom utbildning.</li>
+                    <li>m.m. (se "Anställningar 💼")</li>
+                </ul>
+
+            </div>`,
+          benefits: [
+            "AI: Claude Code, Microsoft Copilot Studio, Chat GPT, Google Gemini",
+            "Projektledning & Strategi",
+            "Agila processer",
+            "Teknikutveckling & Kreativt skapande",
+          ],
+          credit:
+            'Foto: SplitShire – <a href="https://www.pexels.com/@splitshire/" target="_blank" style="color: #64748b; text-decoration: underline;">Pexels.com</a>',
+          buttonText: "Anställningar 💼",
+        },
+        {
+          title: "🎓 Utbildningar & Kurser",
+          thumb:
+            "https://images.pexels.com/photos/7944064/pexels-photo-7944064.jpeg",
+          sheetUrl:
+            "https://docs.google.com/spreadsheets/d/1HCQZwjj94Enwtw1rmGBZ2c_m_4JdIsiP6t1LmY--i0Q/edit?gid=2131024723#gid=2131024723",
+          overview:
+            `Akademisk bakgrund inom IT/Teknik.<br>
+            <div style="padding-left: 40px;">
+                
+                <p style="margin-bottom: 5px;">Med kompetens inom:</p>
+                
+                <!-- Listan ärver indraget, och vi justerar dess interna padding -->
+                <ul style="padding-left: 20px; margin: 0; line-height: 1.6;">
+                    <li>AI,</li>
+                    <li>UX,</li>
+                    <li>backend,</li>
+                    <li>visualisering och systemutveckling,</li>
+                    <li>tekniska processer och beräkningar.</li>
+                </ul>
+
+            </div>
+              `,
+              
+          benefits: ["Fullstack-utvecklare", "IT-projektör", "Energiingenjör"],
+          credit:
+            'Foto: Pavel Danilyuk – <a href="https://www.pexels.com/@pavel-danilyuk/" target="_blank" style="color: #64748b; text-decoration: underline;">Pexels.com</a>',
+          buttonText: "Utbildning 🎓",
+        },
+        {
+          title: "📁 Projekt & Referenser",
+          thumb:
+            "https://images.pexels.com/photos/4792286/pexels-photo-4792286.jpeg",
+          sheetUrl:
+            "https://docs.google.com/spreadsheets/d/1vHtHscZ18Da1uZVxSNdHWXDzbaOMAoG3G2GmjtpevF0/edit?gid=314102216#gid=314102216",
+          overview:
+            "Här presenteras referensprojekt där jag har omsatt mina kompetenser i praktiken.",
+          benefits: ["HTML, CSS, JS", "React", "NextJS", "Java", "C#", "Python", "Teknik"],
+          credit:
+            'Foto: Aneta Lusina – <a href="https://www.pexels.com/@anete-lusina/" target="_blank" style="color: #64748b; text-decoration: underline;">Pexels.com</a>',
+          buttonText: "Referensprojekt 📁",
+        },
+      ];
+
+      let currentActiveIndex = 0;
+      const overlay = document.getElementById("fullscreen-overlay");
+      let lastIndex = -1;
+      const panels = [];
+      let is3DPaused = false;
+
+      function updateOverlayContent(index) {
+        currentActiveIndex = index;
+        const data = cvData[index];
+
+        document.getElementById("fs-title").innerText = data.title;
+        document.getElementById("fs-overview").innerHTML = data.overview;
+        document.getElementById("fs-benefits").innerHTML = data.benefits
+          .map((b) => `<li>${b}</li>`)
+          .join("");
+        document.getElementById("fs-sheet-link").href = data.sheetUrl;
+        document.getElementById("fs-credit").innerHTML = data.credit || "";
+        document.getElementById("fs-sheet-link").innerText =
+          data.buttonText || "Öppna register 📊";
+
+        overlay.style.backgroundImage = `linear-gradient(rgba(15, 23, 42, 0.6), rgba(15, 23, 42, 0.6)), url('${data.thumb}')`;
+      }
+
+      function openOverlay(index) {
+        updateOverlayContent(index);
+        overlay.classList.add("active");
+        setTimeout(() => {
+          is3DPaused = true;
+        }, 500);
+      }
+
+      document.getElementById("btn-close").onclick = () => {
+        is3DPaused = false;
+        overlay.classList.remove("active");
+        animate();
+      };
+
+      document.getElementById("btn-prev").onclick = (e) => {
+        e.stopPropagation();
+        let newIndex = currentActiveIndex - 1;
+        if (newIndex < 0) newIndex = cvData.length - 1;
+        updateOverlayContent(newIndex);
+      };
+
+      document.getElementById("btn-next").onclick = (e) => {
+        e.stopPropagation();
+        let newIndex = (currentActiveIndex + 1) % cvData.length;
+        updateOverlayContent(newIndex);
+      };
+
+      // Bläddra med piltangenterna på tangentbordet
+      window.addEventListener("keydown", (e) => {
+        // Kontrollera först så att overlayen faktiskt är öppen/aktiv
+        if (!overlay.classList.contains("active")) return;
+
+        if (e.key === "ArrowLeft") {
+          // Vänster piltangent -> Gå till föregående
+          let newIndex = currentActiveIndex - 1;
+          if (newIndex < 0) newIndex = cvData.length - 1;
+          updateOverlayContent(newIndex);
+        } else if (e.key === "ArrowRight") {
+          // Höger piltangent -> Gå till nästa
+          let newIndex = (currentActiveIndex + 1) % cvData.length;
+          updateOverlayContent(newIndex);
+        } else if (e.key === "Escape") {
+          // Bonus: Stäng overlayen om man trycker på Escape-tangenten
+          is3DPaused = false;
+          overlay.classList.remove("active");
+          animate();
+        }
+      });
+
+      function createRoundedTexture(texture) {
+        const image = texture.image;
+        const canvas = document.createElement("canvas");
+        canvas.width = image.width;
+        canvas.height = image.height;
+        const ctx = canvas.getContext("2d");
+
+        const minSide = Math.min(canvas.width, canvas.height);
+        const borderRadius = minSide * 0.06;
+
+        ctx.beginPath();
+        ctx.moveTo(borderRadius, 0);
+        ctx.lineTo(canvas.width - borderRadius, 0);
+        ctx.quadraticCurveTo(canvas.width, 0, canvas.width, borderRadius);
+        ctx.lineTo(canvas.width, canvas.height - borderRadius);
+        ctx.quadraticCurveTo(
+          canvas.width,
+          canvas.height,
+          canvas.width - borderRadius,
+          canvas.height,
+        );
+        ctx.lineTo(borderRadius, canvas.height);
+        ctx.quadraticCurveTo(0, canvas.height, 0, canvas.height - borderRadius);
+        ctx.lineTo(0, borderRadius);
+        ctx.quadraticCurveTo(0, 0, borderRadius, 0);
+        ctx.closePath();
+
+        ctx.clip();
+        ctx.drawImage(image, 0, 0);
+
+        const newTex = new THREE.CanvasTexture(canvas);
+        newTex.colorSpace = THREE.SRGBColorSpace;
+        newTex.wrapS = THREE.RepeatWrapping;
+        newTex.repeat.x = -1;
+        return newTex;
+      }
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(
+        45,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000,
+      );
+
+      const isMobile = window.innerWidth < 600;
+      camera.position.set(0, isMobile ? 5 : 2, 35);
+
+      const renderer = new THREE.WebGLRenderer({
+        canvas: document.querySelector("#bg"),
+        antialias: true,
+        alpha: true,
+      });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+      const textureLoader = new THREE.TextureLoader();
+      const raycaster = new THREE.Raycaster();
+      const mouse = new THREE.Vector2();
+
+      // ÅTERSTÄLLD CIRKELRADIE: 11 för mobil (ökat marginellt från 9 för att säkra avståndet), 10 för dator
+      let radius = window.innerWidth < 600 ? 9 : 10;
+      const pivot = new THREE.Group();
+      scene.add(pivot);
+
+      cvData.forEach((data, i) => {
+        const angle = (i / cvData.length) * Math.PI * 2;
+        const geometry = new THREE.PlaneGeometry(1, 1);
+
+        const material = new THREE.MeshBasicMaterial({
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: 0,
+        });
+        const mesh = new THREE.Mesh(geometry, material);
+
+        // KORREKT CIRKELPLATS (cos på X, sin på Z)
+        mesh.position.x = Math.cos(angle) * radius;
+        mesh.position.z = Math.sin(angle) * radius;
+
+        // LUTNING: dynamisk 3D-vinkel
+        mesh.lookAt(0, window.innerWidth < 600 ? -0.5 : 1, 0);
+
+        mesh.userData = { index: i };
+        pivot.add(mesh);
+        panels.push(mesh);
+
+        textureLoader.crossOrigin = "anonymous";
+        textureLoader.load(data.thumb, (tex) => {
+          const roundedTex = createRoundedTexture(tex);
+          const aspect = tex.image.width / tex.image.height;
+          const h = window.innerWidth < 600 ? 7 : 9;
+
+          mesh.scale.set(h * aspect, h, 1);
+          mesh.material.map = roundedTex;
+          mesh.material.opacity = 1;
+          mesh.material.needsUpdate = true;
+        });
+      });
+
+      const pGeometry = new THREE.BufferGeometry();
+      const pCount = 500;
+      const pPos = new Float32Array(pCount * 3);
+      for (let i = 0; i < pCount * 3; i++) pPos[i] = (Math.random() - 0.5) * 60;
+      pGeometry.setAttribute("position", new THREE.BufferAttribute(pPos, 3));
+      const pMaterial = new THREE.PointsMaterial({
+        size: 0.05,
+        color: 0x3498db,
+        transparent: true,
+        opacity: 0.4,
+      });
+      const particles = new THREE.Points(pGeometry, pMaterial);
+      particles.position.z = -10;
+      scene.add(particles);
+
+      let targetRotation = 0,
+        isDragging = false,
+        prevX = 0,
+        moveDist = 0;
+
+      const startAction = (clientX) => {
+        if (overlay.classList.contains("active")) return;
+        isDragging = true;
+        prevX = clientX;
+        moveDist = 0;
+      };
+      const moveAction = (clientX) => {
+        if (!isDragging) return;
+        const delta = clientX - prevX;
+        targetRotation += delta * 0.005;
+        moveDist += Math.abs(delta);
+        prevX = clientX;
+      };
+      const endAction = (event) => {
+        if (!isDragging) return;
+        isDragging = false;
+        if (moveDist < 10) checkClick(event);
+      };
+
+      window.addEventListener("mousedown", (e) => startAction(e.clientX));
+      window.addEventListener(
+        "touchstart",
+        (e) => startAction(e.touches[0].clientX),
+        { passive: false },
+      );
+      window.addEventListener("mousemove", (e) => moveAction(e.clientX));
+      window.addEventListener(
+        "touchmove",
+        (e) => {
+          moveAction(e.touches[0].clientX);
+          if (isDragging) e.preventDefault();
+        },
+        { passive: false },
+      );
+      window.addEventListener("mouseup", (e) => endAction(e));
+      window.addEventListener("touchend", (e) =>
+        endAction(e.changedTouches[0]),
+      );
+
+      window.addEventListener(
+        "wheel",
+        (e) => {
+          if (overlay.classList.contains("active")) return;
+          targetRotation -= e.deltaY * 0.001;
+        },
+        { passive: true },
+      );
+
+      function checkClick(event) {
+        const x = event.clientX || event.pageX;
+        const y = event.clientY || event.pageY;
+        mouse.x = (x / window.innerWidth) * 2 - 1;
+        mouse.y = -(y / window.innerHeight) * 2 + 1;
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObjects(panels);
+        if (intersects.length > 0)
+          openOverlay(intersects[0].object.userData.index);
+      }
+
+      function animate() {
+        if (is3DPaused) return;
+        requestAnimationFrame(animate);
+
+        pivot.rotation.y += (targetRotation - pivot.rotation.y) * 0.08;
+
+        const isMobileView = window.innerWidth < 600;
+        // Siktar raycastern mitt i prick för den återställda lutningen
+        const rayY = isMobileView ? -0.35 : 0;
+
+        raycaster.setFromCamera(new THREE.Vector2(0, rayY), camera);
+        const intersects = raycaster.intersectObjects(panels);
+
+        if (intersects.length > 0) {
+          const idx = intersects[0].object.userData.index;
+          if (idx !== lastIndex) {
+            document.getElementById("current-title").innerText =
+              cvData[idx].title;
+            lastIndex = idx;
+          }
+        }
+
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener("resize", () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+
+        const isMobileView = window.innerWidth < 600;
+        camera.position.y = isMobileView ? 5 : 2;
+
+        radius = isMobileView ? 11 : 10;
+
+        panels.forEach((mesh, i) => {
+          const angle = (i / cvData.length) * Math.PI * 2;
+          mesh.position.x = Math.cos(angle) * radius;
+          mesh.position.z = Math.sin(angle) * radius;
+
+          // 3D-vinkel för datorskärm:
+          mesh.lookAt(0, isMobileView ? -0.5 : 1, 0);
+        });
+
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+
+      // Initiera och ladda första kortet vid start
+      updateOverlayContent(0);
+      document.getElementById("current-title").innerText = cvData[0].title;
+
+      animate();
+    </script>
+  </body>
+</html>
