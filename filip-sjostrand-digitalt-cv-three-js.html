@@ -69,11 +69,37 @@
         display: block;
       }
 
+      .linkedin-item {
+          display: flex;
+          justify-content: flex-start;
+          align-items: center;
+          margin-top: 5px;
+      }
+
+      .linkedin-item a {
+          display: inline-block;
+          line-height: 1;
+      }
+
+      .linkedin-icon {
+          width: 20px;
+          height: 20px;
+          fill: #0077b5; /* LinkedIns blåa färg */
+          transition: fill 0.2s ease, transform 0.2s ease;
+      }
+
+      /* Effekt när man håller muspekaren över ikonen */
+      .linkedin-icon:hover {
+          fill: #005582; /* Blir något mörkare blå vid hovring */
+          transform: scale(1.05); /* En diskret förstoringseffekt */
+      }
+
       h1 {
         margin: 0 0 4px 0;
         font-size: 1.4rem;
         background: linear-gradient(45deg, #3498db, #bdbdbd);
         -webkit-background-clip: text;
+        background-clip: text; /* Standardegenskap för kompabilitet */
         -webkit-text-fill-color: transparent;
       }
 
@@ -140,6 +166,7 @@
         text-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
         background: linear-gradient(45deg, #ffffff, #cbd5e1);
         -webkit-background-clip: text;
+        background-clip: text; /* Standardegenskap för kompabilitet */
         -webkit-text-fill-color: transparent;
         margin: 0;
         transition: opacity 0.2s ease;
@@ -415,6 +442,13 @@
               >filip_sjostrand@hotmail.com</a
             >
           </div>
+          <div class="contact-item linkedin-item">
+            <a href="https://www.linkedin.com/in/filip-sjöstrand" target="_blank" title="Besök min LinkedIn" aria-label="LinkedIn">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="linkedin-icon">
+                <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+              </svg>
+            </a>
+          </div>
         </div>
       </div>
       <p class="instruction">Dra för att snurra • Klicka för detaljer</p>
@@ -508,7 +542,7 @@
                 
                 <p style="margin-bottom: 5px;">Med kompetens inom:</p>
                 
-                <!-- Listan ärver indraget, och vi justerar dess interna padding -->
+                <!-- Listan ärver indraget, interna padding justerad -->
                 <ul style="padding-left: 20px; margin: 0; line-height: 1.6;">
                     <li>AI,</li>
                     <li>UX,</li>
@@ -520,7 +554,7 @@
             </div>
               `,
               
-          benefits: ["Fullstack-utvecklare", "IT-projektör", "Energiingenjör"],
+          benefits: ["Fullstack-utvecklare", "IT-projektör", "AI-promptare", "Energiingenjör"],
           credit:
             'Foto: Pavel Danilyuk – <a href="https://www.pexels.com/@pavel-danilyuk/" target="_blank" style="color: #64748b; text-decoration: underline;">Pexels.com</a>',
           buttonText: "Utbildning 🎓",
@@ -533,7 +567,7 @@
             "https://docs.google.com/spreadsheets/d/1vHtHscZ18Da1uZVxSNdHWXDzbaOMAoG3G2GmjtpevF0/edit?gid=314102216#gid=314102216",
           overview:
             "Här presenteras referensprojekt där jag har omsatt mina kompetenser i praktiken.",
-          benefits: ["HTML, CSS, JS", "React", "NextJS", "Java", "C#", "Python", "Teknik"],
+          benefits: ["HTML, CSS, JS", "React", "NextJS", "Java", "C#", "Python", "AI: Claude Code, Microsoft Copilot Studio, Chat GPT, Google Gemini", "Teknik"],
           credit:
             'Foto: Aneta Lusina – <a href="https://www.pexels.com/@anete-lusina/" target="_blank" style="color: #64748b; text-decoration: underline;">Pexels.com</a>',
           buttonText: "Referensprojekt 📁",
